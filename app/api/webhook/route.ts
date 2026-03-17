@@ -34,6 +34,13 @@ export async function POST(request: NextRequest) {
   console.log('POST /api/webhook - Incoming message');
 
   try {
+    // Check if Supabase is configured
+    if (!supabaseServer) {
+      console.error('❌ Supabase server not initialized - missing environment variables');
+      console.error('Status: SUPABASE_SERVICE_ROLE_KEY or NEXT_PUBLIC_SUPABASE_URL not set');
+      return new NextResponse('Supabase not configured', { status: 500 });
+    }
+
     const body = await request.json();
     console.log('Webhook payload received:', JSON.stringify(body, null, 2));
 

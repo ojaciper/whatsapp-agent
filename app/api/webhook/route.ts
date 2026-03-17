@@ -41,6 +41,9 @@ export async function POST(request: NextRequest) {
       return new NextResponse('Supabase not configured', { status: 500 });
     }
 
+    // Type assertion since we've verified it's not null above
+    const db = supabaseServer as any;
+
     const body = await request.json();
     console.log('Webhook payload received:', JSON.stringify(body, null, 2));
 
@@ -57,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Get or create conversation
     let conversationId: string;
     try {
-      const { data: existingConversation, error: fetchError } = await supabaseServer
+      const { data: existingConversation, error: fetchError } = await db
         .from('conversations')
         .select('id')
         .eq('phone_number', phoneNumber)
@@ -72,7 +75,7 @@ export async function POST(request: NextRequest) {
         console.log(`Found existing conversation: ${conversationId}`);
 
         // Update conversation's updated_at
-        const { error: updateError } = await supabaseServer
+        const { error: updateError } = await db
           .from('conversations')
           .update({ updated_at: new Date().toISOString() })
           .eq('id', conversationId);
@@ -82,7 +85,7 @@ export async function POST(request: NextRequest) {
         }
       } else {
         // Create new conversation
-        const { data: newConversation, error: createError } = await supabaseServer
+        const { data: newConversation, error: createError } = await db
           .from('conversations')
           .insert([{ phone_number: phoneNumber }])
           .select('id')
@@ -103,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     // Store user message in database
     try {
-      const { error: insertError } = await supabaseServer
+      const { error: insertError } = await db
         .from('messages')
         .insert([
           {
@@ -128,7 +131,7 @@ export async function POST(request: NextRequest) {
     // Get conversation history for context
     let conversationHistory: any[] = [];
     try {
-      const { data: messages, error: historyError } = await supabaseServer
+      const { data: messages, error: historyError } = await db
         .from('messages')
         .select('role, content')
         .eq('conversation_id', conversationId)
@@ -180,7 +183,7 @@ export async function POST(request: NextRequest) {
 
     // Store AI response in database
     try {
-      const { error: insertError } = await supabaseServer
+      const { error: insertError } = await db
         .from('messages')
         .insert([
           {

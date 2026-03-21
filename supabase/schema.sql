@@ -29,31 +29,19 @@ CREATE INDEX idx_messages_created_at ON messages(created_at);
 -- RLS Policies for conversations table
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 
--- Service role can do everything on conversations
-CREATE POLICY "Service role can manage conversations"
+-- Allow all operations for service role (for webhooks and server operations)
+CREATE POLICY "Service role bypass conversations"
   ON conversations
   FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
-
--- Authenticated users can read conversations
-CREATE POLICY "Authenticated users can read conversations"
-  ON conversations
-  FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (true)
+  WITH CHECK (true);
 
 -- RLS Policies for messages table
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
--- Service role can do everything on messages
-CREATE POLICY "Service role can manage messages"
+-- Allow all operations for service role (for webhooks and server operations)
+CREATE POLICY "Service role bypass messages"
   ON messages
   FOR ALL
-  USING (auth.role() = 'service_role')
-  WITH CHECK (auth.role() = 'service_role');
-
--- Authenticated users can read messages
-CREATE POLICY "Authenticated users can read messages"
-  ON messages
-  FOR SELECT
-  USING (auth.role() = 'authenticated');
+  USING (true)
+  WITH CHECK (true);

@@ -44,6 +44,9 @@ export async function POST(request: NextRequest) {
     // Type assertion since we've verified it's not null above
     const db = supabaseServer as any;
 
+    console.log('Supabase client initialized:', !!db);
+    console.log('Service role key present:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+
     const body = await request.json();
     console.log('Webhook payload received:', JSON.stringify(body, null, 2));
 
